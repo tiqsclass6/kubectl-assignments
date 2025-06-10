@@ -86,8 +86,10 @@ kubectl apply -f 1-beron-demo/
 kubectl get svc -n my-first-ns
 ```
 
-- **Beron Cluster**
+**Beron Cluster**
 ![Beron Cluster](/Screenshots/beron-cluster.jpg)
+**Beron**
+![Beron](/Screenshots/beron.jpg)
 
 ---
 
@@ -161,9 +163,11 @@ https://prometheus.io/
 
 ```bash
 export POD_NAME=$(kubectl get pods --namespace prometheus -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")
-
 kubectl --namespace prometheus port-forward $POD_NAME 9090
 ```
+
+**Prometheus: Type URL - <http://127.0.0.1:9090/query>**
+![Prometheus](/Screenshots/prometheus.jpg)
 
 ---
 
@@ -186,14 +190,5 @@ kubectl delete -f A-namespaces/
 kubectl delete -f B-service-accounts/
 terraform destroy
 ```
-
----
-
-## 📸 Screenshots - Show Your Work
-
-- **Beron**
-![Beron](/Screenshots/beron.jpg)
-- **Prometheus**
-![Prometheus](/Screenshots/prometheus.jpg)
 
 ---

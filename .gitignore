@@ -41,4 +41,4 @@ terraform.rc
 *.json
 
 # Kube Configuration File
-*.kubeconfig
+example.kubeconfig

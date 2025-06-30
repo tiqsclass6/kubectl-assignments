@@ -1,194 +1,157 @@
-# Kubernetes Assignment (06-07-2025)
+# 🧠 Kubernetes Assignment (06-28-2025)
 
-![Terraform](https://img.shields.io/badge/terraform-v1.6+-blueviolet)
-![EKS](https://img.shields.io/badge/EKS-AWS--Managed--Kubernetes-orange)
-![Status](https://img.shields.io/badge/deployment-success-green)
-![License](https://img.shields.io/badge/license-MIT-lightgrey)
+![Helm Version](https://img.shields.io/badge/Helm-3.x-blue?logo=helm)
+![Kubernetes Version](https://img.shields.io/badge/K8s-1.21%2B-green?logo=kubernetes)
+![Terraform](https://img.shields.io/badge/Terraform-v1.5%2B-purple?logo=terraform)
+![Status](https://img.shields.io/badge/Status-Operational-brightgreen)
+![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
 
-## 📦 Project Overview
-
-This project showcases a complete Infrastructure-as-Code (IaC) solution to deploy a secure and production-ready Amazon EKS cluster using Terraform. It includes networking, IAM roles, Kubernetes manifests, Prometheus monitoring, storage provisioning, and Helm-based deployments.
+This repository provides a quickstart guide for deploying **Prometheus** and **Grafana** using the `kube-prometheus-stack` Helm chart. It sets up full observability in your Kubernetes cluster with persistent storage and LoadBalancer services.
 
 ---
 
-## 📁 Project Structure (Key Components)
+## 📁 Project Structure
 
 ```shell
-.
-├── Terraform Core Files
-│   ├── 0-var.tf                    # Input variables
-│   ├── 1-auth.tf                   # AWS provider and authentication
-│   ├── 2-vpc.tf                    # VPC
-│   ├── 3-subnets                   # Subnets
-│   ├── 4-igw.tf                    # Internet Gateway
-│   ├── 5-nat.tf                    # NAT Gateway
-│   ├── 6-rtb.tf                    # Route tables
-│   ├── 7-eks.tf                    # EKS cluster
-│   ├── 8-node.tf                   # Node groups
-│   ├── 9-runtime.tf                # Runtime configs
-│   ├── 10-iam-oidc.tf              # OIDC provider config
-│   ├── 11a-storage-iam.tf          # IAM roles for storage
-│   ├── 11b-storage-helm.tf         # Helm release for EBS CSI driver
-│   ├── 12-output.tf                # Outputs
-│
-├── Kubernetes YAML Examples
-│   ├── A-namespaces/               # Namespace definitions
-│   ├── B-service-accounts/         # ServiceAccount definitions
-│   ├── 1-beron-demo/               # Basic pod/deploy/service examples
-│   ├── 2-irsa-demo/                # IRSA pod and serviceAccount
-│   ├── 3-anton-demo/               # RBAC (viewer/admin bindings)
-│   ├── 4-storage-test/             # PVC and pod using storage
-│   ├── 5-prometheus/                # Prometheus Helm values and ns
-│
-├── Screenshots/                    # Visual references
-├── example.kubeconfig              # Sample kubeconfig file
-└── README.md                       # This file
+kubernetes-assignment/
+├── charts/         # (Optional) Custom or downloaded charts
+├── manifests/      # (Optional) Additional YAML configs
+├── scripts/        # Automation scripts (e.g., install.sh, cleanup.sh)
+├── README.md       # This documentation
+└── values.yaml     # Custom Helm values (if applicable)
 ```
 
 ---
 
-## 🧪 Deployment Steps
+## 🚀 Installation Steps
 
-```bash
-terraform init -upgrade
-terraform fmt
-terraform validate
-terraform plan
-terraform apply
-```
-
----
-
-## 🔍 Outputs (from `terraform output`)
-
-```hcl
-ebs_csi_iam_role_arn = "arn:aws:iam::866340886126:role/demo-ebs-csi-iam-role"
-eks_cluster_info = {
-  "arn" = "arn:aws:eks:us-east-1:866340886126:cluster/demo"
-  "description" = "EKS cluster info"
-  "endpoint" = "https://DD3C17664E65B7197654BC12D49E098C.gr7.us-east-1.eks.amazonaws.com"
-  "id" = "demo"
-  "name" = "demo"
-}
-eks_node_group_summary = "Node group 'demo-private-nodes' runs 2 instance(s) of type t3.small"
-openid_connect_provider = {
-  "arn" = "arn:aws:iam::866340886126:oidc-provider/oidc.eks.us-east-1.amazonaws.com/id/DD3C17664E65B7197654BC12D49E098C"
-  "url" = "https://oidc.eks.us-east-1.amazonaws.com/id/DD3C17664E65B7197654BC12D49E098C"
-}
-```
-
-### Apply Kubernetes manifests
-
-```bash
-kubectl apply -f A-namespaces/
-kubectl apply -f B-service-accounts/
-kubectl apply -f 1-beron-demo/
-kubectl get svc -n my-first-ns
-```
-
-**Beron Cluster**
-![Beron Cluster](/Screenshots/beron-cluster.jpg)
-**Beron**
-![Beron](/Screenshots/beron.jpg)
-
----
-
-### Helm: Deploy Prometheus
+### 1. Add Helm Repository
 
 ```bash
 helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-
-helm upgrade -i prometheus prometheus-community/prometheus \
-    --namespace prometheus \
-    --set alertmanager.persistence.storageClass="gp2" \
-    --set server.persistentVolume.storageClass="gp2"
+helm repo update
 ```
 
-### Output from above command
+### 2. Install Prometheus + Grafana Stack
 
-```groovy
-$ helm upgrade -i prometheus prometheus-community/prometheus \
-    --namespace prometheus \
-    --set alertmanager.persistence.storageClass="gp2" \
-    --set server.persistentVolume.storageClass="gp2"
-Release "prometheus" does not exist. Installing it now.
-NAME: prometheus
-LAST DEPLOYED: Mon Jun  9 19:52:46 2025
-NAMESPACE: prometheus
-STATUS: deployed
-REVISION: 1
-TEST SUITE: None
-NOTES:
-The Prometheus server can be accessed via port 80 on the following DNS name from within your cluster:
-prometheus-server.prometheus.svc.cluster.local
-
-
-Get the Prometheus server URL by running these commands in the same shell:
-  export POD_NAME=$(kubectl get pods --namespace prometheus -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")       
-  kubectl --namespace prometheus port-forward $POD_NAME 9090
-
-
-The Prometheus alertmanager can be accessed via port 9093 on the following DNS name from within your cluster:
-prometheus-alertmanager.prometheus.svc.cluster.local
-
-
-Get the Alertmanager URL by running these commands in the same shell:
-  export POD_NAME=$(kubectl get pods --namespace prometheus -l "app.kubernetes.io/name=alertmanager,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")     
-  kubectl --namespace prometheus port-forward $POD_NAME 9093
-#################################################################################
-######   WARNING: Pod Security Policy has been disabled by default since    #####
-######            it deprecated after k8s 1.25+. use                        #####
-######            (index .Values "prometheus-node-exporter" "rbac"          #####
-###### .          "pspEnabled") with (index .Values                         #####
-######            "prometheus-node-exporter" "rbac" "pspAnnotations")       #####
-######            in case you still need it.                                #####
-#################################################################################
-
-
-The Prometheus PushGateway can be accessed via port 9091 on the following DNS name from within your cluster:
-prometheus-prometheus-pushgateway.prometheus.svc.cluster.local
-
-
-Get the PushGateway URL by running these commands in the same shell:
-  export POD_NAME=$(kubectl get pods --namespace prometheus -l "app=prometheus-pushgateway,component=pushgateway" -o jsonpath="{.items[0].metadata.name}")
-  kubectl --namespace prometheus port-forward $POD_NAME 9091
-
-For more information on running Prometheus, visit:
-https://prometheus.io/
+```bash
+helm install monitoring prometheus-community/kube-prometheus-stack  --namespace observability --create-namespace  --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.storageClassName="gp2"  --set prometheus.prometheusSpec.storageSpec.volumeClaimTemplate.spec.resources.requests.storage="50Gi"  --set prometheus.service.type=LoadBalancer  --set grafana.service.type=LoadBalancer  --set grafana.persistence.enabled=true  --set grafana.persistence.storageClassName="gp2"  --set alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.storageClassName="gp2"  --set alertmanager.alertmanagerSpec.storage.volumeClaimTemplate.spec.resources.requests.storage="10Gi"
 ```
 
 ---
 
-## 🔍 Outputs (from `Prometheus from Helm`)
+## 🔑 Grafana Access
+
+- **Username**: `admin`
+- **Password**: `prom-operator`
+
+To get the auto-generated password (if overwritten):
 
 ```bash
-export POD_NAME=$(kubectl get pods --namespace prometheus -l "app.kubernetes.io/name=prometheus,app.kubernetes.io/instance=prometheus" -o jsonpath="{.items[0].metadata.name}")
-kubectl --namespace prometheus port-forward $POD_NAME 9090
+kubectl --namespace observability get secrets monitoring-grafana -o jsonpath="{.data.admin-password}" | base64 -d ; echo
 ```
 
-**Prometheus: Type URL - <http://127.0.0.1:9090/query>**
-![Prometheus](/Screenshots/prometheus.jpg)
+---
+
+## 📊 Dashboard Access
+
+```bash
+echo "Grafana Dashboard: http://$(kubectl get svc monitoring-grafana -n observability -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'):80"
+echo "Prometheus Server: http://$(kubectl get svc monitoring-kube-prometheus-prometheus -n observability -o jsonpath='{.status.loadBalancer.ingress[0].hostname}'):9090"
+```
+
+Or port forward locally:
+
+```bash
+export POD_NAME=$(kubectl --namespace observability get pod -l "app.kubernetes.io/name=grafana,app.kubernetes.io/instance=monitoring" -o name)
+kubectl --namespace observability port-forward $POD_NAME 3000
+```
+
+---
+
+## 📌 Useful Commands
+
+```bash
+kubectl --namespace observability get pods -l "release=monitoring"
+kubectl get sts -n observability
+kubectl get ds -n observability
+kubectl get svc -n observability
+```
+
+---
+
+## 🧹 Cleanup
+
+```bash
+helm uninstall monitoring -n observability
+kubectl delete namespace observability
+```
 
 ---
 
 ## 🛠️ Troubleshooting
 
-| Issue | Fix |
-|-------|-----|
-| `terraform plan` forces `desired_capacity` | Use `ignore_changes` in the node group |
-| `kubectl timeout` | Make sure kubeconfig is updated and nodes are Ready |
-| `Pod cannot access IRSA role` | Check `sa.yaml` and OIDC provider ARN matches |
-| `Helm Release failed` | Ensure namespace exists and Helm repo is added |
+| Issue | Resolution |
+|-------|------------|
+| `LoadBalancer` IP is pending | Ensure your cluster supports external LoadBalancer (e.g., AWS, GCP, Azure). |
+| PVCs not bound | Check if the `gp2` storage class exists: `kubectl get storageclass` |
+| Grafana password unknown | Retrieve it using the secrets command above. |
+| Services not accessible | Check firewall rules, network policies, and whether the services are correctly exposed. |
 
 ---
 
-## 🔥 Teardown Instructions
+## ⚙️ Terraform Integration
+
+If you're using Terraform to provision your Kubernetes infrastructure (e.g., EKS, GKE, AKS), you can manage your observability stack in tandem.
+
+### 🔨 Terraform Build Steps
+
+1. Initialize your working directory:
+
+   ```bash
+   terraform init -reconfigure
+   ```
+
+2. Preview your changes:
+
+   ```bash
+   terraform fmt
+   terraform validate
+   terraform plan
+   ```
+
+3. Apply the configuration to build infrastructure:
+
+   ```bash
+   terraform apply -auto-approve
+   ```
+
+### 💣 Terraform Destroy
+
+To tear down all infrastructure created by Terraform:
 
 ```bash
-kubectl delete -f 1-beron-demo/
-kubectl delete -f A-namespaces/
-kubectl delete -f B-service-accounts/
-terraform destroy
+terraform destroy -auto-approve
 ```
+
+> Ensure you are in the correct working directory and your state is not shared with production infrastructure before executing `destroy`.
+
+---
+
+## ✍️ Authors & Acknowledgments
+
+- **Author:** T.I.Q.S.
+- **Group Leader:** John Sweeney
+
+### 🙏 Inspiration
+
+This project was built with inspiration, mentorship, and guidance from:
+
+- Sensei **"Darth Malgus" Theo**
+- Lord **Beron**
+- Sir **Rob**
+- Jedi Master **Derrick**
+
+Their wisdom, vision, and unwavering discipline made this mission possible.
 
 ---

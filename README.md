@@ -13,7 +13,7 @@ This repository contains modular Amazon EKS infrastructure deployments using **T
 
 ## 📌 Branch Breakdown
 
-### 🔹 [`assignment-05312025`](https://github.com/tiqsclass6/kubectl-assignments/tree/assignment-05312025)
+### 🔹 [assignment-05312025](https://github.com/tiqsclass6/kubectl-assignments/tree/assignment-05312025)
 
 - **Focus**: Foundational AWS EKS infrastructure using Terraform.
 - **Includes**:
@@ -23,9 +23,7 @@ This repository contains modular Amazon EKS infrastructure deployments using **T
   - Example outputs: EKS ARN, node group info, OIDC URL
   - Manual `kubectl apply` walkthrough
 
----
-
-### 🔹 [`assignment-06072025`](https://github.com/tiqsclass6/kubectl-assignments/tree/assignment-06072025)
+### 🔹 [assignment-06072025](https://github.com/tiqsclass6/kubectl-assignments/tree/assignment-06072025)
 
 - **Focus**: Production-grade Kubernetes cluster with monitoring and persistent storage.
 - **Includes**:
@@ -34,6 +32,17 @@ This repository contains modular Amazon EKS infrastructure deployments using **T
   - ClusterRole and ClusterRoleBinding RBAC demos via Anton’s viewer/admin examples
   - Full Prometheus service notes, port-forward instructions, and Helm values config
   - Logical file structure: Terraform provisioning, IRSA, RBAC, namespaces, service accounts, screenshots
+
+### 🔹 [assignment-06282025](https://github.com/tiqsclass6/kubectl-assignments/tree/assignment-06282025)
+
+- **Focus**: Service-level monitoring, pod auto-scaling, and advanced Helm configuration.
+- **Includes**:
+  - Horizontal Pod Autoscaler (HPA) with CPU metrics
+  - Custom metrics using Prometheus Adapter
+  - Helm upgrade/rollback demo for versioned deployments
+  - Deep dive into `helm upgrade --install`, rollback strategies, and release history
+  - Refined folder structure: `C-hpa-configs/`, `D-metrics-server/`, `E-helm-releases/`
+  - Enhanced Terraform state management and Helm release tracking via `terraform-provider-helm`
 
 ---
 
@@ -45,12 +54,12 @@ cd kubectl-assignments
 git checkout <branch-name>
 
 terraform init -upgrade
+terraform fmt
 terraform validate
-terraform apply
+terraform apply -auto-approve
 
 kubectl apply -f A-namespaces/
 kubectl apply -f B-service-accounts/
-kubectl apply -f 1-beron-demo/
 ```
 
 ---
@@ -58,11 +67,10 @@ kubectl apply -f 1-beron-demo/
 ## 🔥 Teardown Instructions
 
 ```bash
-kubectl delete -f 1-beron-demo/
 kubectl delete -f A-namespaces/
 kubectl delete -f B-service-accounts/
 
-terraform destroy
+terraform destroy -auto-approve
 ```
 
 ---
@@ -71,12 +79,14 @@ terraform destroy
 
 - **Terraform** – AWS EKS and infrastructure provisioning
 - **Amazon EKS** – Elastic Kubernetes Service
-- **Helm** – Prometheus chart deployment
+- **Helm** – Prometheus chart deployment, Helm upgrades/rollbacks
 - **kubectl** – Apply deployments, services, namespaces
 - **IRSA** – IAM Roles for Service Accounts
 - **Persistent Storage** – EBS CSI driver with StorageClass
 - **RBAC** – Cluster roles and role bindings
-- **Screenshots** – Visual evidence of EKS Prometheus dashboards
+- **Metrics Server & HPA** – Auto-scaling based on real-time metrics
+- **Prometheus Adapter** – Custom metrics collection
+- **Screenshots** – Visual evidence of EKS dashboards and workloads
 
 ---
 
@@ -84,3 +94,5 @@ terraform destroy
 
 - **Maintainer:** T.I.Q.S.
 - **Repo:** [tiqsclass6/kubectl-assignments](https://github.com/tiqsclass6/kubectl-assignments)
+
+---

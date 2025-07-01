@@ -1,5 +1,5 @@
-# IAM Role identity for cluster itself
 
+# IAM Role identity for cluster itself
 resource "aws_iam_role" "demo" {
   name = "${var.cluster_name}-eks-cluster-demo"
 
@@ -19,10 +19,10 @@ resource "aws_iam_role" "demo" {
 POLICY
 }
 
+
 # legacy EKS IAM Permissons (overly broad as it includes many CLB permissons)
 # [ "ec2:DescribeInstances", "ec2DescribeNetworkInterfaces", "ec2:DescribeVpcs", "ec2:DescribeDhcpOptions", "kms:DescribeKey" ]
 # https://docs.aws.amazon.com/eks/latest/userguide/service_IAM_role.html
-
 resource "aws_iam_role_policy_attachment" "demo-AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   role       = aws_iam_role.demo.name
@@ -30,7 +30,6 @@ resource "aws_iam_role_policy_attachment" "demo-AmazonEKSClusterPolicy" {
 
 
 # EKS Cluster service
-
 resource "aws_eks_cluster" "demo" {
   name     = var.cluster_name
   role_arn = aws_iam_role.demo.arn

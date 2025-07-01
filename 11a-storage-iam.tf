@@ -8,7 +8,16 @@ data "http" "ebs_csi_iam_policy" {
   }
 }
 
+# output "ebs_csi_iam_policy" {
+#   #value = data.http.ebs_csi_iam_policy.body
+#   value = data.http.ebs_csi_iam_policy.response_body
+# }
+
+
 ####################################################
+
+
+
 
 # Resource: Create EBS CSI IAM Policy 
 resource "aws_iam_policy" "ebs_csi_iam_policy" {
@@ -18,6 +27,10 @@ resource "aws_iam_policy" "ebs_csi_iam_policy" {
   #policy = data.http.ebs_csi_iam_policy.body
   policy = data.http.ebs_csi_iam_policy.response_body
 }
+
+# output "ebs_csi_iam_policy_arn" {
+#   value = aws_iam_policy.ebs_csi_iam_policy.arn 
+# }
 
 # Resource: Create IAM Role and associate the EBS IAM Policy to it
 resource "aws_iam_role" "ebs_csi_iam_role" {
@@ -59,3 +72,4 @@ output "ebs_csi_iam_role_arn" {
   description = "EBS CSI IAM Role ARN"
   value       = aws_iam_role.ebs_csi_iam_role.arn
 }
+

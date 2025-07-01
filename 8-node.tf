@@ -31,6 +31,9 @@ resource "aws_iam_role_policy_attachment" "nodes-AmazonEC2ContainerRegistryReadO
   role       = aws_iam_role.nodes.name
 }
 
+
+
+
 ##################
 
 # Node group which is an ASG(s) managed by EKS service
@@ -67,6 +70,17 @@ resource "aws_eks_node_group" "private-nodes" {
     role = "general"
   }
 
+  # taint {
+  #   key    = "team"
+  #   value  = "devops"
+  #   effect = "NO_SCHEDULE"
+  # }
+
+  # launch_template {
+  #   name    = aws_launch_template.eks-with-disks.name
+  #   version = aws_launch_template.eks-with-disks.latest_version
+  # }
+
   depends_on = [
     aws_iam_role_policy_attachment.nodes-AmazonEKSWorkerNodePolicy,
     aws_iam_role_policy_attachment.nodes-AmazonEKS_CNI_Policy,
@@ -80,3 +94,4 @@ resource "aws_eks_node_group" "private-nodes" {
     ignore_changes = [scaling_config[0].desired_size]
   }
 }
+

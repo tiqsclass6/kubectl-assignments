@@ -1,5 +1,5 @@
-# Resource: AWS IAM Open ID Connect Provider
 
+# Resource: AWS IAM Open ID Connect Provider
 resource "aws_iam_openid_connect_provider" "oidc_provider" {
   #client_id_list  = ["sts.${data.aws_partition.current.dns_suffix}"]
   client_id_list  = ["sts.amazonaws.com"]

@@ -1,4 +1,4 @@
-# 🧠 Kubernetes Assignment (06-28-2025)
+# 🧠 Kubernetes Assignment (06-30-2025)
 
 ![Helm Version](https://img.shields.io/badge/Helm-3.x-blue?logo=helm)
 ![Kubernetes Version](https://img.shields.io/badge/K8s-1.21%2B-green?logo=kubernetes)
